@@ -1,0 +1,89 @@
+{
+  "beautify.language": {
+    "html": ["htm", "html", "django-html"]
+  },
+  "editor.formatOnSave": true,
+  "editor.renderControlCharacters": true,
+  "editor.suggest.localityBonus": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.associations": {
+    "**/*.html": "html",
+    "**/templates/**/*.html": "django-html",
+    "**/templates/**/*": "django-txt"
+  },
+  "[python]": {
+    "editor.tabSize": 4,
+    "editor.formatOnPaste": false,
+    "editor.formatOnType": false,
+    "editor.insertSpaces": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[django-html]": {
+    "editor.tabSize": 2,
+    "editor.quickSuggestions": {
+      "strings": true
+    },
+    "editor.wordWrap": "on",
+    "editor.defaultFormatter": "HookyQR.beautify"
+  },
+  "[html]": {
+    "editor.tabSize": 2,
+    "editor.quickSuggestions": {
+      "strings": true
+    },
+    "editor.defaultFormatter": "HookyQR.beautify"
+  },
+  "[typescript]": {
+    "editor.tabSize": 2
+  },
+  "[javascript]": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "emmet.includeLanguages": {
+    "django-html": "html"
+  },
+  "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
+  "python.pythonPath": "${workspaceFolder}/backend/.venv/bin/python",
+  "python.pipenvPath": "pipenv",
+  "python.envFile": "${workspaceFolder}/backend/.env",
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": false,
+  "python.linting.pycodestyleEnabled": false,
+  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Path": "${workspaceFolder}/backend/.venv/bin/flake8",
+  "python.linting.mypyEnabled": true,
+  "python.linting.mypyPath": "${workspaceFolder}/backend/.venv/bin/mypy",
+  "python.formatting.provider": "autopep8",
+  // "python.formatting.blackPath": "${workspaceFolder}/backend/.venv/bin/black",
+  "python.formatting.autopep8Path": "${workspaceFolder}/backend/.venv/bin/autopep8",
+  "python.sortImports.path": "${workspaceFolder}/backend/.venv/bin/isort",
+  "autoDocstring.docstringFormat": "google",
+  "files.watcherExclude": {
+    ".git": true,
+    ".venv": true
+  },
+  "python.analysis.extraPaths": [
+    "backend",
+    "${workspaceFolder}/backend/.venv/lib/python3.9/site-packages"
+  ],
+  "python.autoComplete.extraPaths": [
+    "backend",
+    "${workspaceFolder}/backend/.venv/lib/python3.9/site-packages"
+  ]
+}

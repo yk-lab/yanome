@@ -1,0 +1,16 @@
+FROM node:lts-slim as builder
+
+RUN apt-get update -qq && \
+    apt-get install -y --no-install-recommends \
+    g++ \
+    build-essential \
+    && apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /frontend
+
+COPY ./frontend/package.json ./frontend/yarn.lock /frontend/
+RUN yarn install --ignore-optional && yarn cache clean
+
+EXPOSE 8600
+CMD npm run dev

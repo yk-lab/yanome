@@ -1,0 +1,49 @@
+services:
+  backend:
+    container_name: yanome-backend
+    build:
+      dockerfile: Dockerfile.backend.dev
+      context: .
+    restart: on-failure
+    env_file: ./backend/.env
+    # command: python3 manage.py runserver_plus 0.0.0.0:8601
+    command: python3 manage.py runserver 0.0.0.0:8601
+    volumes:
+      - ./backend:/app:cached
+      # - python-packages:/root/.local/share
+      - virtualenv:/app/.venv
+    depends_on:
+      - db
+    ports:
+      - '8601:8601'
+
+  # frontend:
+  #   container_name: yanome-frontend
+  #   build:
+  #     dockerfile: Dockerfile.frontend.dev
+  #     context: .
+  #   restart: on-failure
+  #   env_file: ./frontend/.env
+  #   command: yarn dev
+  #   volumes:
+  #     - ./frontend:/frontend:cached
+  #   depends_on:
+  #     - backend
+  #   ports:
+  #     - '8600:8600'
+
+  db:
+    container_name: yanome-db
+    image: postgres:14
+    restart: on-failure
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: "yanome"
+      POSTGRES_USER: "yanome"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C"
+
+volumes:
+  virtualenv:
+  pgdata:

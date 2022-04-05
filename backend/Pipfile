@@ -1,0 +1,43 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "<5"
+django-filter = "*"
+django-extensions = "*"
+werkzeug = "*"
+django-model-utils = "*"
+uwsgi = "*"
+django-glrm = "*"
+django-tenants = "*"
+django-tenant-users = "*"
+django-sendgrid-v5 = "*"
+django-admin-honeypot = "*"
+dj-database-url = "*"
+psycopg2-binary = "*"
+django-allauth = "*"
+django-debug-toolbar = "*"
+sentry-sdk = "*"
+django-on-heroku = "*"
+djangorestframework = "*"
+markdown = "*"
+django-flags = "*"
+django-mail-auth = "*"
+
+[dev-packages]
+flake8 = "*"
+autopep8 = "*"
+isort = "*"
+coverage = "*"
+mypy = "*"
+pydocstyle = "*"
+pre-commit = "*"
+bandit = "*"
+types-requests = "*"
+django-stubs = "*"
+django-types = "*"
+
+[requires]
+python_version = "3.10"
