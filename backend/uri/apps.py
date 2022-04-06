@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class WebpopupConfig(AppConfig):
+class UriConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'webpopup'
+    name = 'uri'
