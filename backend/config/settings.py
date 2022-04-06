@@ -15,6 +15,7 @@ from distutils.util import strtobool
 from pathlib import Path
 
 import dj_database_url
+from django_extensions.utils import InternalIPS
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -34,6 +35,13 @@ ALLOWED_HOSTS = [
     for host in os.getenv('ALLOWED_HOSTS', '').split(',')
     if host
 ]
+
+if DEBUG:
+    INTERNAL_IPS = InternalIPS([
+        '10.0.0.0/8',
+        '172.16.0.0/12',
+        '192.168.0.0/16',
+    ])
 
 
 # Application definition
@@ -65,6 +73,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+if DEBUG:
+    INSTALLED_APPS += [
+        'debug_toolbar',
+    ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -75,6 +87,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+if DEBUG:
+    MIDDLEWARE += [
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    ]
 
 ROOT_URLCONF = 'config.urls'
 
