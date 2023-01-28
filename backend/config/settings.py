@@ -47,6 +47,9 @@ if DEBUG:
 # Application definition
 
 INSTALLED_APPS = [
+    # apps
+    'uri',
+
     # accounts
     'accounts',
 
@@ -207,3 +210,95 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# LOGGING
+
+# Support for X-Request-ID
+# https://devcenter.heroku.com/ja/articles/http-request-id#usage-with-django
+LOG_REQUEST_ID_HEADER = 'HTTP_X_REQUEST_ID'
+LOG_REQUESTS = True
+GENERATE_REQUEST_ID_IF_NOT_IN_HEADER = True
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'request_id': {
+            '()': 'log_request_id.filters.RequestIDFilter'
+        },
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'formatters': {
+        'django.server': {
+            '()': 'django.utils.log.ServerFormatter',
+            'format': '[{server_time}] {message}',
+            'style': '{',
+        },
+        'standard': {
+            'format': '%(levelname)-8s [%(asctime)s] [%(request_id)s] %(name)s:%(lineno)s %(funcName)s %(message)s',  # noqa: E501
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard',
+            'filters': ['request_id'],
+        },
+        'django.server': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'django.server',
+        },
+        # 'rq_console': {
+        #     'level': 'DEBUG',
+        #     'class': 'rq.utils.ColorizingStreamHandler',
+        #     'formatter': 'standard',
+        #     'exclude': ['%(asctime)s'],
+        #     'filters': ['request_id'],
+        # },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'django.server': {
+            'handlers': ['django.server'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'log_request_id.middleware': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        # 'rq.worker': {
+        #     'handlers': ['rq_console'],
+        #     'level': 'DEBUG' if DEBUG else 'INFO',
+        #     'propagate': False,
+        # },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG' if DEBUG else 'INFO',
+    },
+}
+
+
+# https://github.com/sbdchd/django-types
+if True:
+    from django.db.models import ForeignKey
+    from django.db.models.query import QuerySet
+
+    # NOTE: there are probably other items you'll need to monkey patch
+    # depending on your version.
+    for cls in [QuerySet, ForeignKey]:
+        cls.__class_getitem__ = classmethod(  # type: ignore [attr-defined]
+            lambda cls, *args, **kwargs: cls)

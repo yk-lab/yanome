@@ -25,6 +25,7 @@ djangorestframework = "*"
 markdown = "*"
 django-flags = "*"
 django-mail-auth = "*"
+django-log-request-id = "*"
 
 [dev-packages]
 flake8 = "*"

@@ -22,6 +22,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     # path('admin/', include('admin_honeypot.urls')),
     path('zeus/', admin.site.urls),
+    path('', include('uri.urls')),
 ]
 
 if settings.DEBUG:
