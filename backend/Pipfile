@@ -26,6 +26,9 @@ markdown = "*"
 django-flags = "*"
 django-mail-auth = "*"
 django-log-request-id = "*"
+django-user-sessions = "*"
+django-xforwardedfor-middleware = "==2.0"
+django-otp = "*"
 
 [dev-packages]
 flake8 = "*"

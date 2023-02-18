@@ -46,7 +46,9 @@ if DEBUG:
 
 # Application definition
 
-INSTALLED_APPS = [
+SHARED_APPS = []
+
+TENANT_APPS = [
     # apps
     'uri',
 
@@ -54,10 +56,14 @@ INSTALLED_APPS = [
     'accounts',
 
     # Django Mail Auth https://django-mail-auth.readthedocs.io/
-    'mailauth',
+    # 'mailauth',
 
-    'mailauth.contrib.admin',
-    'mailauth.contrib.user',
+    # 'mailauth.contrib.admin',
+    # 'mailauth.contrib.user',
+
+    # django-otp https://django-otp-official.readthedocs.io/
+    'django_otp',
+    'django_otp.plugins.otp_email',
 
     # Django-Flags https://cfpb.github.io/django-flags/
     'flags',
@@ -72,23 +78,42 @@ INSTALLED_APPS = [
     'django.contrib.auth',
 
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
+    # 'django.contrib.sessions',
+    'user_sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
 if DEBUG:
-    INSTALLED_APPS += [
+    SHARED_APPS += [
         'debug_toolbar',
     ]
 
+    TENANT_APPS += [
+        'debug_toolbar',
+    ]
+
+INSTALLED_APPS = [
+]
+
 MIDDLEWARE = [
+    # NOTE: django-tenants の公式ドキュメントでは TenantMainMiddleware を先頭にするようにあるが
+    # django_on_heroku との都合上、SecurityMiddleware を先頭に変更
+    # → Security - WhiteNoise - RequestID - TenantMain の順に処理
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'log_request_id.middleware.RequestIDMiddleware',
+    'django_tenants.middleware.main.TenantMainMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'x_forwarded_for.middleware.XForwardedForMiddleware',
+    'user_sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # django-glrm: 原則、全てのページをログイン必須とする
+    # https://django-glrm.readthedocs.io/en/latest/readme.html
+    'global_login_required.GlobalLoginRequiredMiddleware',
 ]
 if DEBUG:
     MIDDLEWARE += [
@@ -106,6 +131,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.request',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -121,10 +147,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+DATABASE_ROUTERS = (
+    'django_tenants.routers.TenantSyncRouter',
+)
+
 conn_max_age = int(os.environ.get('CONN_MAX_AGE', 600))
 db_ssl_required = not DEBUG
 db_config = dj_database_url.config(
-    # engine='django_tenants.postgresql_backend',
+    engine='django_tenants.postgresql_backend',
     conn_max_age=conn_max_age, ssl_require=db_ssl_required)
 DATABASES = {
     'default': dict(
@@ -135,22 +165,25 @@ DATABASES = {
 
 
 # Email
-if DEBUG:
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-else:
+
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+if SENDGRID_API_KEY:
     EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
-    SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
     SENDGRID_TRACK_CLICKS_PLAIN = False
     SENDGRID_SANDBOX_MODE_IN_DEBUG = False
     if (_default_from_email := os.getenv('DEFAULT_FROM_EMAIL')):
         DEFAULT_FROM_EMAIL = _default_from_email
+else:
+    if not DEBUG:
+        raise Exception('メール送信が無効です')
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
 # ユーザ認証系
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
-    'mailauth.backends.MailAuthBackend',
+    # 'mailauth.backends.MailAuthBackend',
 )
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -168,6 +201,31 @@ LOGIN_REDIRECT_URL = '/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 # メールアドレスが確認済みである必要がある
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+
+
+# django-glrm の設定
+# https://django-glrm.readthedocs.io/en/latest/readme.html
+
+PUBLIC_VIEWS = [
+    'config.views.trigger_error',
+    'school_messages.views.open_tracking.OpenTrackingView',
+    'school_messages.views.read_tracking.ReadTrackingView',
+]
+
+PUBLIC_PATHS = [
+    r'^/accounts/.*',
+    r'^/admin/.*',
+    # r'^/zeus/.*',  # 共通のログイン画面を表示
+    r'^/__debug__/.*',
+]
+
+
+# Django User Sessions
+# https://django-user-sessions.readthedocs.io/en/stable/index.html
+
+SESSION_ENGINE = 'user_sessions.backends.db'
+
+SILENCED_SYSTEM_CHECKS = ['admin.E410']
 
 
 # Password validation
